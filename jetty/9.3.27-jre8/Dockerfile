@@ -1,7 +1,7 @@
 FROM openjdk:8-jre
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN groupadd -r jetty && useradd -r -g jetty jetty
+RUN groupadd -r cliadmin -g 1000 && useradd -r -M -u 1000 --shell=/bin/bash -g cliadmin cliadmin
 
 ENV JETTY_HOME /usr/local/jetty
 ENV PATH $JETTY_HOME/bin:$PATH
@@ -53,15 +53,10 @@ WORKDIR $JETTY_BASE
 RUN modules="$(grep -- ^--module= "$JETTY_HOME/start.ini" | cut -d= -f2 | paste -d, -s)" \
 	&& set -xe \
 	&& java -jar "$JETTY_HOME/start.jar" --add-to-startd="$modules" \
-	&& chown -R jetty:jetty "$JETTY_BASE" \
+	&& chown -R cliadmin:cliadmin "$JETTY_BASE" \
 	&& rm -rf /tmp/hsperfdata_root
 
 ENV TMPDIR /opt/OmniVista_2500_NMS/data/tmp
 RUN set -xe \
 	&& mkdir -p "$TMPDIR" \
-	&& chown -R jetty:jetty "$TMPDIR"
-
-USER jetty
-EXPOSE 8080
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["java","-jar","/usr/local/jetty/start.jar"]
+	&& chown -R cliadmin:cliadmin "$TMPDIR"
