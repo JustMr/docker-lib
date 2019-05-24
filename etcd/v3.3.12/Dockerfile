@@ -1,1 +1,1 @@
-FROM docker pull gcr.io/etcd-development/etcd:v3.3.12
+FROM gcr.io/etcd-development/etcd:v3.3.12
